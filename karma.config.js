@@ -23,6 +23,8 @@ module.exports = function(config) {
     browsers: browsers,
     reporters: ['mocha'],
     captureConsole: true,
+    loggers: [{type: 'console'}],
+    logLevel: config.LOG_DEBUG,
     preprocessors: {
       'src/**/*.ts': ['rollup', 'transformPath']
     },

@@ -8,7 +8,7 @@
     "dev:dev": "NODE_ENV=dev karma start karma.config.js",
     "dev:chrome": "NODE_ENV=dev karma start karma.config.js --chrome",
     "dev:firefox": "NODE_ENV=dev karma start karma.config.js --firefox",
-    "test": "NODE_ENV=prod karma start karma.config.js"
+    "test": "NODE_ENV=peod karma start karma.config.js"
   },
   "author": "Eric Huang",
   "license": "NONE",

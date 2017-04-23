@@ -2,6 +2,9 @@ import { Measurable, BaseMetric } from './BaseMetric';
 
 export default class ChromeMetric extends BaseMetric implements Measurable {
   computeFirstPaintTime() {
-    throw new Error('Method not implemented.');
+    const loadTimes = window['chrome'].loadTimes();
+    const firstPaintTime = loadTimes.firstPaintTime;
+    const startLoadTime = loadTimes.startLoadTime;
+    return (firstPaintTime - startLoadTime) * 1000;
   }
 }

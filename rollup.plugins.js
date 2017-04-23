@@ -15,7 +15,8 @@ const plugins = [
   }),
   replacePlugin({
     // if in dev mode, log to console
-    LOG: isDevMode ? 'console.log' : 'if (false)'
+    LOG: isDevMode ? 'console.log' : 'if (false)',
+    __DEV__: isDevMode
   }),
   commonjsPlugin()
 ];
