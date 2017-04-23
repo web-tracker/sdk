@@ -1,0 +1,38 @@
+{
+  "name": "sdk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "NODE_ENV=prod rollup --config rollup.config.js",
+    "dev:dev": "NODE_ENV=dev karma start karma.config.js",
+    "dev:chrome": "NODE_ENV=dev karma start karma.config.js --chrome",
+    "dev:firefox": "NODE_ENV=dev karma start karma.config.js --firefox",
+    "test": "NODE_ENV=prod karma start karma.config.js"
+  },
+  "author": "Eric Huang",
+  "license": "NONE",
+  "devDependencies": {
+    "jasmine-core": "^2.5.2",
+    "karma": "^1.6.0",
+    "karma-chrome-launcher": "^2.0.0",
+    "karma-firefox-launcher": "^1.0.1",
+    "karma-jasmine": "^1.1.0",
+    "karma-mocha-reporter": "^2.2.3",
+    "karma-phantomjs-launcher": "^1.0.4",
+    "karma-rollup-preprocessor": "^4.0.0",
+    "karma-transform-path-preprocessor": "^0.0.3",
+    "phantomjs-prebuilt": "^2.1.14",
+    "rollup": "^0.41.6",
+    "rollup-plugin-commonjs": "^8.0.2",
+    "rollup-plugin-node-resolve": "^3.0.0",
+    "rollup-plugin-replace": "^1.1.1",
+    "rollup-plugin-typescript": "^0.8.1",
+    "rollup-plugin-uglify": "^1.0.2",
+    "tslint": "^5.1.0",
+    "typescript": "^2.3.0-dev.20170420"
+  },
+  "dependencies": {
+    "detector": "^2.5.0"
+  }
+}
