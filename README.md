@@ -1,2 +1,1 @@
-# web-tracker
-Web Front End Performance and Error Tracker
+# SDK for Web Tracker
