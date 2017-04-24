@@ -2,7 +2,7 @@ const isDev = process.env.NODE_ENV === 'dev';
 
 export default {
   entry: 'src/index.ts',
-  dest: 'dist/sdk.js',
+  dest: 'lib/sdk.js',
   moduleName: 'WebTracker',
   format: 'iife',
   sourceMap: true,
