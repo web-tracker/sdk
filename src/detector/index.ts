@@ -65,7 +65,7 @@ export enum EngineType {
 }
 
 export class Browser {
-  private _type: string;
+  public _type: string;
   constructor(
     public type: BrowserType,
     public version: string
@@ -141,6 +141,9 @@ export class Environment {
         break;
       case 'firefox':
         browser = BrowserType.Firefox;
+        break;
+      case 'safari':
+        browser = BrowserType.Safari;
         break;
       case 'opera':
         browser = BrowserType.Opera;

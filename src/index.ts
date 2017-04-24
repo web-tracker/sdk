@@ -3,11 +3,15 @@ import ChromeMetric from './metric/ChromeMetric';
 import { Measurable, BaseMetric } from './metric/BaseMetric';
 import FirefoxMetric from './metric/FirefoxMetric';
 import OperaMetric from './metric/OperaMetric';
+import SafariMetric from './metric/SafariMetric';
+import MSEdgeMetric from './metric/MSEdgeMetric';
+import MSIEMetric from './metric/MSIEMetric';
 export * from './Detector';
 
 const metricMeasuringStrategy = () => {
   let metricStrategy: Measurable;
   const environment = new Environment().detect();
+  LOG('Current Browser:', environment.browser._type, environment.browser.version);
   switch (environment.browser.type) {
     case BrowserType.Chrome:
       metricStrategy = new ChromeMetric();
@@ -18,9 +22,18 @@ const metricMeasuringStrategy = () => {
     case BrowserType.Opera:
       metricStrategy = new OperaMetric();
       break;
-    // Meet unexpected browser,
-    // use basic measurement strategy.
+    case BrowserType.Safari:
+      metricStrategy = new SafariMetric();
+      break;
+    case BrowserType.MS_Edge:
+      metricStrategy = new MSEdgeMetric();
+      break;
+    case BrowserType.MSIE:
+      metricStrategy = new MSIEMetric();
+      break;
     default:
+      // Meet unexpected browser,
+      // use basic measurement strategy.
       metricStrategy = new BaseMetric();
       break;
   }

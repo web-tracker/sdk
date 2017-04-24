@@ -1,6 +1,6 @@
 let browsers = null;
 const argv = process.argv;
-const presetBrowser = ['PhantomJS', 'Chrome', 'Firefox', 'Opera'];
+const presetBrowser = ['PhantomJS', 'Chrome', 'Firefox', 'Opera', 'Safari'];
 const devBrowser = argv[argv.length - 1].substring(2);
 const isDevMode = process.env.NODE_ENV === 'dev';
 if (isDevMode) {
@@ -49,6 +49,8 @@ module.exports = function(config) {
       'karma-jasmine',
       'karma-inject-html',
       'karma-mocha-reporter',
+      'karma-opera-launcher',
+      'karma-safari-launcher',
       'karma-chrome-launcher',
       'karma-firefox-launcher',
       'karma-phantomjs-launcher',
