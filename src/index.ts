@@ -1,26 +1,46 @@
 import { BrowserType, Environment } from './Detector';
-import ChromeMetric from './metrics/ChromeMetric';
+import ChromeMetric from './metric/ChromeMetric';
+import { Measurable, BaseMetric } from './metric/BaseMetric';
+import FirefoxMetric from './metric/FirefoxMetric';
+import OperaMetric from './metric/OperaMetric';
 export * from './Detector';
 
-const env = new Environment();
-const detected = env.detect();
-
-function measure() {
-  if (detected.browser.type === BrowserType.Chrome) {
-    const metric = new ChromeMetric();
-    const firstPaintTime = metric.computeFirstPaintTime();
-    // if (firstPaintTime <= 0) {
-    //   setTimeout(() => {
-    //     measure();
-    //   }, 200);
-    //   return;
-    // }
-    LOG('Chrome first paint time:', firstPaintTime);
-    const DNSLookupTime = metric.computeDNSLookupTime();
-    LOG('DNSLookupTime:', DNSLookupTime);
-    LOG('Load Event End', window.performance.timing.loadEventEnd);
-    LOG('First Paint Time', window['chrome'].loadTimes().firstPaintTime);
-    LOG(window.location.href);
+function metricMeasuringStrategy() {
+  let metricStrategy: Measurable;
+  const environment = (new Environment()).detect();
+  switch (environment.browser.type) {
+    case BrowserType.Chrome:
+      metricStrategy = new ChromeMetric();
+      break;
+    case BrowserType.Firefox:
+      metricStrategy = new FirefoxMetric();
+      break;
+    case BrowserType.Opera:
+      metricStrategy = new OperaMetric();
+      break;
+    // Meet unexpected Browser,
+    // use basic measurement strategy.
+    default:
+      metricStrategy = new BaseMetric();
+      break;
   }
+  const totalLoadingTime = metricStrategy.computeTotalLoadingTime();
+  // Incorrect total loading time,
+  // which means it's measured prematurely.
+  if (totalLoadingTime <= 0) {
+    LOG('Measured prematurely, retrying');
+    metricMeasuringStrategy();
+    return;
+  }
+
+  // DNS Lookup Time
+  const DNSLookupTime = metricStrategy.computeDNSLookupTime();
+
+  LOG('DNSLookupTime:', DNSLookupTime);
+  LOG('Total Loading Time:', totalLoadingTime);
 }
-window.onload = measure;
+
+// Start measuring after page loaded completely
+window.addEventListener('load', () => {
+  setTimeout(() => metricMeasuringStrategy());
+});

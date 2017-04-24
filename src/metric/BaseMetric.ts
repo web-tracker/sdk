@@ -19,8 +19,8 @@ export interface Measurable {
 
 /**
  * Base performance metric measurement.
- * Implements Navigation Timing API and
- * Resource Timing API, which are W3C standards.
+ * Implements Navigation Timing API and Resource Timing API,
+ * which are W3C standards. Otherwise implements polyfill for most of the browsers.
  *
  * Compatibility
  * http://caniuse.com/#feat=nav-timing
@@ -36,7 +36,13 @@ export class BaseMetric implements Measurable {
     throw new Error('Method not implemented.');
   }
   computeTotalLoadingTime() {
-    throw new Error('Method not implemented.');
+    const performanceAPI = window.performance;
+    if (!performanceAPI) {
+      return -1;
+    }
+    const timing = performanceAPI.timing;
+    const totalLoadingTime = timing.loadEventEnd - timing.navigationStart;
+    return totalLoadingTime;
   }
   computeResourceTime() {
     throw new Error('Method not implemented.');
