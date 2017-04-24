@@ -5,7 +5,7 @@ import FirefoxMetric from './metric/FirefoxMetric';
 import OperaMetric from './metric/OperaMetric';
 export * from './Detector';
 
-function metricMeasuringStrategy() {
+const metricMeasuringStrategy = () => {
   let metricStrategy: Measurable;
   const environment = (new Environment()).detect();
   switch (environment.browser.type) {
@@ -18,7 +18,7 @@ function metricMeasuringStrategy() {
     case BrowserType.Opera:
       metricStrategy = new OperaMetric();
       break;
-    // Meet unexpected Browser,
+    // Meet unexpected browser,
     // use basic measurement strategy.
     default:
       metricStrategy = new BaseMetric();
@@ -33,12 +33,15 @@ function metricMeasuringStrategy() {
     return;
   }
 
-  // DNS Lookup Time
+  const firstPaintTime = metricStrategy.computeFirstPaintTime();
   const DNSLookupTime = metricStrategy.computeDNSLookupTime();
+  const firstByteTime = metricStrategy.computeFirstByteTime();
 
   LOG('DNSLookupTime:', DNSLookupTime);
   LOG('Total Loading Time:', totalLoadingTime);
-}
+  LOG('First Byte Time:', firstByteTime);
+  LOG('First Paint Time', firstPaintTime);
+};
 
 // Start measuring after page loaded completely
 window.addEventListener('load', () => {

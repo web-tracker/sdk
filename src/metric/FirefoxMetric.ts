@@ -1,7 +1,3 @@
-import { BaseMetric } from './BaseMetric';
+import { BaseMetric, Measurable } from './BaseMetric';
 
-export default class FirefoxMetric extends BaseMetric implements BaseMetric {
-  computeFirstPaintTime() {
-    throw new Error('Method not implemented.');
-  }
-}
+export default class FirefoxMetric extends BaseMetric implements Measurable {}

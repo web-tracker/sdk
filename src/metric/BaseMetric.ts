@@ -1,3 +1,6 @@
+/**
+ * Metric mesuaring methods.
+ */
 export interface Measurable {
   // Time to first paint
   computeFirstPaintTime();
@@ -14,7 +17,7 @@ export interface Measurable {
   // Time to look up DNS
   computeDNSLookupTime();
   // Time to first byte
-  computeFistByteTime();
+  computeFirstByteTime();
 }
 
 /**
@@ -26,8 +29,17 @@ export interface Measurable {
  * http://caniuse.com/#feat=nav-timing
  */
 export class BaseMetric implements Measurable {
+  private performanceAPI = window.performance;
+  private timing = this.performanceAPI.timing;
+
+  /**
+   * Polyfill for measuring first paint time.
+   * The strategy is to use Timing API.
+   * Compatibility: IE9+
+   */
   computeFirstPaintTime() {
-    throw new Error('Method not implemented.');
+    const firstPaintTime = this.timing.domLoading - this.timing.navigationStart;
+    return firstPaintTime <= 0 ? -1 : firstPaintTime;
   }
   computeFirstMearningfulTime() {
     throw new Error('Method not implemented.');
@@ -36,13 +48,8 @@ export class BaseMetric implements Measurable {
     throw new Error('Method not implemented.');
   }
   computeTotalLoadingTime() {
-    const performanceAPI = window.performance;
-    if (!performanceAPI) {
-      return -1;
-    }
-    const timing = performanceAPI.timing;
-    const totalLoadingTime = timing.loadEventEnd - timing.navigationStart;
-    return totalLoadingTime;
+    const loadingTime = this.timing.loadEventEnd - this.timing.navigationStart;
+    return loadingTime <= 0 ? -1 : loadingTime;
   }
   computeResourceTime() {
     throw new Error('Method not implemented.');
@@ -56,16 +63,15 @@ export class BaseMetric implements Measurable {
    * Note: the time might be 0 due to cache.
    */
   computeDNSLookupTime() {
-    const performanceAPI = window.performance;
-    if (!performanceAPI) {
-      return -1;
-    }
-    const timing = performanceAPI.timing;
-    const DNSLookupTime = timing.domainLookupEnd - timing.domainLookupStart;
-    return DNSLookupTime;
+    const DNSTime = this.timing.domainLookupEnd - this.timing.domainLookupStart;
+    return DNSTime <= 0 ? -1 : DNSTime;
   }
 
-  computeFistByteTime() {
-    throw new Error('Method not implemented.');
+  /**
+   * https://en.wikipedia.org/wiki/Time_To_First_Byte
+   */
+  computeFirstByteTime() {
+    const firstByteTime = this.timing.responseStart - this.timing.navigationStart;
+    return firstByteTime <= 0 ? -1 : firstByteTime;
   }
 }

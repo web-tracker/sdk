@@ -19,6 +19,9 @@ module.exports = function(config) {
       // Added for file watch
       { pattern: 'src/**/*.ts', included: false }
     ],
+    exclude: [
+      'src/types.d.ts'
+    ],
     frameworks: ['jasmine'],
     browsers: browsers,
     reporters: ['mocha'],
