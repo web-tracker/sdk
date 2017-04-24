@@ -1,5 +1,8 @@
 import detector from 'detector';
 
+/**
+ * Detector Field.
+ */
 interface DetectorField {
   name: string;
   version: string;
@@ -7,7 +10,7 @@ interface DetectorField {
 }
 
 /**
- * 3rd party detector wrapper
+ * 3rd party detector wrapper.
  */
 class Detector {
   constructor(
@@ -18,6 +21,9 @@ class Detector {
   ) {}
 }
 
+/**
+ * Instantiate detector.
+ */
 const _detector: Detector = new Detector(
   detector.device,
   detector.os,
@@ -112,6 +118,7 @@ export class Environment {
   /**
    * Detects the environment of target browser.
    * Like type, version, network, etc.
+   * @return {Environment}
    */
   public detect(): Environment {
     // Detect browser status

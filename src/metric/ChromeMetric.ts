@@ -2,7 +2,13 @@ import { Measurable, BaseMetric } from './BaseMetric';
 
 export default class ChromeMetric extends BaseMetric implements Measurable {
   private loadTimes = window['chrome'].loadTimes();
-  computeFirstPaintTime() {
+
+  /**
+   * Override parent's class by using Chrome's loadTimes method.
+   * @override
+   * @return {number}
+   */
+  computeFirstPaintTime(): number {
     const firstPaintTime = this.loadTimes.firstPaintTime;
     const startLoadTime = this.loadTimes.startLoadTime;
     // Somehow we cannot get first paint time,

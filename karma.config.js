@@ -29,7 +29,7 @@ module.exports = function(config) {
     loggers: [{type: 'console'}],
     logLevel: config.LOG_DEBUG,
     preprocessors: {
-      'src/**/*.ts': ['rollup', 'transformPath']
+      'src/**/*.ts': ['rollup', 'transformPath', 'inject-html']
     },
     rollupPreprocessor: {
       plugins: require('./rollup.plugins'),
@@ -42,14 +42,18 @@ module.exports = function(config) {
         return path.replace(/\index.ts$/, 'sdk.js')
       }
     },
+    injectHtml: {
+      file: 'test/test.html'
+    },
     plugins: [
       'karma-jasmine',
+      'karma-inject-html',
       'karma-mocha-reporter',
       'karma-chrome-launcher',
       'karma-firefox-launcher',
       'karma-phantomjs-launcher',
       'karma-rollup-preprocessor',
-      'karma-transform-path-preprocessor'
+      'karma-transform-path-preprocessor',
     ],
     autoWatch: true,
     singleRun: !isDevMode
