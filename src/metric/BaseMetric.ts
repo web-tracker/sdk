@@ -66,6 +66,7 @@ export class BaseMetric implements Measurable {
   /**
    * Time to interact with DOM.
    * Measuring DOMReady time.
+   * @return {number}
    */
   public computeFirstInteractionTime(): number {
     if (!this.timing) return -1;
@@ -98,6 +99,7 @@ export class BaseMetric implements Measurable {
    * Computes resources loading time.
    * Calculate the average time of each resource type.
    * Compatibility: IE10+
+   * @return {ResourceTime}
    */
   public computeResourceTime(): ResourceTime {
     const resourcesTime = new ResourceTime();
