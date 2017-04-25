@@ -14,7 +14,7 @@ export interface Measurable {
   // Time to first paint
   computeFirstPaintTime(): number;
   // Time to show above the fold
-  computeFirstMearningfulTime(): number;
+  computeFirstMeaningfulTime(): number;
   // Time to first interaction
   computeFirstInteractionTime(): number;
   // Total loading time
@@ -31,6 +31,21 @@ export interface Measurable {
   computeFirstByteTime(): number;
 }
 
+export class Metric {
+  firstPaintTime: number;
+  firstMeaningfulTime: number;
+  firstInteractionTime: number;
+  totalLoadingTime: number;
+  downloadingTime: number;
+  DOMParsingTime: number;
+  DNSLookupTime: number;
+  firstByteTime: number;
+  // Resources time
+  imagesTime: number;
+  stylesTime: number;
+  scriptsTime: number;
+}
+
 /**
  * Base performance metric measurement.
  * Implements Navigation Timing API and Resource Timing API,
@@ -39,11 +54,12 @@ export interface Measurable {
  * Compatibility
  * http://caniuse.com/#feat=nav-timing
  */
-export class BaseMetric implements Measurable {
+export class BaseMetric extends Metric implements Measurable {
   private timing: PerformanceTiming;
   private performanceAPI: Performance;
 
   constructor() {
+    super();
     this.performanceAPI = window.performance;
     if (this.performanceAPI) {
       this.timing = this.performanceAPI.timing;
@@ -62,7 +78,7 @@ export class BaseMetric implements Measurable {
     return firstPaintTime <= 0 ? -1 : firstPaintTime;
   }
 
-  public computeFirstMearningfulTime(): number {
+  public computeFirstMeaningfulTime(): number {
     throw new Error('Method not implemented.');
   }
 

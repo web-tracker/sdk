@@ -1,15 +1,16 @@
-import { Reportable, Reporter } from './Reporter';
+import { Reporter } from './Reporter';
+import { Metric } from '../metric/BaseMetric';
 
-export default class PerformanceReporter extends Reporter implements Reportable {
-  // Browser might ignore requests with the same url
-  private uniqueId: number = 0;
+export interface MetricReportable {
+  report(metric: Metric): void;
+}
+
+export default class PerformanceReporter extends Reporter implements MetricReportable {
   private endpoint: string = ``;
 
-  report(data: string): void {
+  report(metric: Metric): void {
+    this.URLBuilder(metric);
     this.reportByImage(this.endpoint);
   }
 
-  URLBuilder() {
-
-  }
 }
