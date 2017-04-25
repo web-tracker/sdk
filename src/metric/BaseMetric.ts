@@ -1,4 +1,7 @@
-class ResourceTime {
+/**
+ * Records time to download resources.
+ */
+export class ResourceTime {
   public img: number;
   public script: number;
   public link: number;
@@ -55,7 +58,7 @@ export class BaseMetric implements Measurable {
    */
   public computeFirstPaintTime(): number {
     if (!this.timing) return -1;
-    const firstPaintTime = this.timing.domLoading - this.timing.navigationStart;
+    const firstPaintTime = Math.round(this.timing.domLoading - this.timing.navigationStart);
     return firstPaintTime <= 0 ? -1 : firstPaintTime;
   }
 
@@ -70,7 +73,7 @@ export class BaseMetric implements Measurable {
    */
   public computeFirstInteractionTime(): number {
     if (!this.timing) return -1;
-    const interactionTime = this.timing.domInteractive - this.timing.navigationStart;
+    const interactionTime = Math.round(this.timing.domInteractive - this.timing.navigationStart);
     return interactionTime <= 0 ? -1 : interactionTime;
   }
 
@@ -81,7 +84,7 @@ export class BaseMetric implements Measurable {
    */
   public computeTotalLoadingTime(): number {
     if (!this.timing) return -1;
-    const loadingTime = this.timing.loadEventEnd - this.timing.navigationStart;
+    const loadingTime = Math.round(this.timing.loadEventEnd - this.timing.navigationStart);
     return loadingTime <= 0 ? -1 : loadingTime;
   }
 
@@ -91,7 +94,7 @@ export class BaseMetric implements Measurable {
    */
   public computeTotalDownloadingTime(): number {
     if (!this.timing) return -1;
-    const pageDownloadingTime = this.timing.responseEnd - this.timing.requestStart;
+    const pageDownloadingTime = Math.round(this.timing.responseEnd - this.timing.requestStart);
     return pageDownloadingTime <= 0 ? -1 : pageDownloadingTime;
   }
 
@@ -103,7 +106,9 @@ export class BaseMetric implements Measurable {
    */
   public computeResourceTime(): ResourceTime {
     const resourcesTime = new ResourceTime();
-    if (!this.performanceAPI) return resourcesTime;
+    if (!this.performanceAPI || !this.performanceAPI.getEntriesByType) {
+      return resourcesTime;
+    }
     const resourcesItems = this.performanceAPI.getEntriesByType('resource');
     if (!resourcesItems || !(resourcesItems instanceof Array)) {
       return resourcesTime;
@@ -131,8 +136,8 @@ export class BaseMetric implements Measurable {
    */
   public computeDOMParsingTime(): number {
     if (!this.timing) return -1;
-    const DOMparsingTime = this.timing.domComplete - this.timing.responseEnd;
-    return DOMparsingTime <= 0 ? -1 : DOMparsingTime;
+    const DOMParsingTime = Math.round(this.timing.domComplete - this.timing.responseEnd);
+    return DOMParsingTime <= 0 ? -1 : DOMParsingTime;
   }
 
   /**
@@ -142,7 +147,7 @@ export class BaseMetric implements Measurable {
    */
   public computeDNSLookupTime(): number {
     if (!this.timing) return -1;
-    const DNSTime = this.timing.domainLookupEnd - this.timing.domainLookupStart;
+    const DNSTime = Math.round(this.timing.domainLookupEnd - this.timing.domainLookupStart);
     return DNSTime <= 0 ? -1 : DNSTime;
   }
 
@@ -153,7 +158,7 @@ export class BaseMetric implements Measurable {
    */
   public computeFirstByteTime(): number {
     if (!this.timing) return -1;
-    const firstByteTime = this.timing.responseStart - this.timing.navigationStart;
+    const firstByteTime = Math.round(this.timing.responseStart - this.timing.navigationStart);
     return firstByteTime <= 0 ? -1 : firstByteTime;
   }
 }

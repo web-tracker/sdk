@@ -16,6 +16,6 @@ export default class ChromeMetric extends BaseMetric implements Measurable {
     if (firstPaintTime <= 0) {
       return super.computeFirstByteTime();
     }
-    return (firstPaintTime - startLoadTime) * 1000;
+    return Math.round((firstPaintTime - startLoadTime) * 1000);
   }
 }

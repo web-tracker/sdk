@@ -1,17 +1,20 @@
-import { BrowserType, Environment } from './detector';
-import ChromeMetric from './metric/ChromeMetric';
+import { BrowserType, Environment } from './detector/BrowserDetector';
 import { Measurable, BaseMetric } from './metric/BaseMetric';
+import ChromeMetric from './metric/ChromeMetric';
 import FirefoxMetric from './metric/FirefoxMetric';
 import OperaMetric from './metric/OperaMetric';
 import SafariMetric from './metric/SafariMetric';
 import MSEdgeMetric from './metric/MSEdgeMetric';
 import MSIEMetric from './metric/MSIEMetric';
-export * from './Detector';
+import PerformanceReporter from './reporter/PerformanceReporter';
 
-const metricMeasuringStrategy = () => {
+export * from './detector/BrowserDetector';
+
+async function metricMeasuringStrategy() {
   let metricStrategy: Measurable;
   const environment = new Environment().detect();
-  LOG('Current Browser:', environment.browser._type, environment.browser.version);
+  LOG('Current Browser:',
+    environment.browser._type, environment.browser.version);
   switch (environment.browser.type) {
     case BrowserType.Chrome:
       metricStrategy = new ChromeMetric();
@@ -64,7 +67,15 @@ const metricMeasuringStrategy = () => {
   LOG('Resource Time:', JSON.stringify(resourcesTime));
   LOG('Total Downloding Time:', totalDownloadingTime);
   LOG('DOM Parsing Time:', DOMParsingTime);
-};
+
+  const reporter = new PerformanceReporter();
+  try {
+    await reporter.report('');
+  } catch (error) {
+    // Reporting process may fail,
+    // retry or report by other approach.
+  }
+}
 
 // Start measuring after page loaded completely
 window.addEventListener('load', () => {
