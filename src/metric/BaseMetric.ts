@@ -71,6 +71,9 @@ export class BaseMetric extends Metric implements Measurable {
    */
   public measure() {
     const resourcesTime = this.computeResourceTime();
+    this.imagesTime = resourcesTime.img;
+    this.stylesTime = resourcesTime.link;
+    this.scriptsTime = resourcesTime.script;
     this.DNSLookupTime = this.computeDNSLookupTime();
     this.DOMParsingTime = this.computeDOMParsingTime();
     this.firstByteTime = this.computeFirstByteTime();
@@ -79,9 +82,6 @@ export class BaseMetric extends Metric implements Measurable {
     this.firstPaintTime = this.computeFirstPaintTime();
     this.downloadingTime = this.computeTotalDownloadingTime();
     this.totalLoadingTime = this.computeTotalLoadingTime();
-    this.imagesTime = resourcesTime.img;
-    this.stylesTime = resourcesTime.link;
-    this.scriptsTime = resourcesTime.script;
     return this;
   }
 

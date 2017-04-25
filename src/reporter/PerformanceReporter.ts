@@ -21,7 +21,7 @@ const parameterMapper = {
 };
 
 export default class PerformanceReporter extends Reporter implements MetricReportable {
-  private endpoint: string = `//127.0.0.1/`;
+  private endpoint: string = `//127.0.0.1:3000/perf.gif`;
 
   report(environment: Environment, metric: Metric): Promise<void> {
     const parameters = this.parameterBuilder(environment, metric);
