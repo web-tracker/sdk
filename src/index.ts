@@ -1,5 +1,5 @@
-import { BrowserType, Environment } from './detector/BrowserDetector';
-import { Measurable, BaseMetric } from './metric/BaseMetric';
+import { BrowserType, Environment } from './detector/EnvironmentDetector';
+import { BaseMetric } from './metric/BaseMetric';
 import ChromeMetric from './metric/ChromeMetric';
 import FirefoxMetric from './metric/FirefoxMetric';
 import OperaMetric from './metric/OperaMetric';
@@ -8,10 +8,10 @@ import MSEdgeMetric from './metric/MSEdgeMetric';
 import MSIEMetric from './metric/MSIEMetric';
 import PerformanceReporter from './reporter/PerformanceReporter';
 
-export * from './detector/BrowserDetector';
+export * from './detector/EnvironmentDetector';
 
-async function metricMeasuringStrategy() {
-  let metricStrategy: Measurable;
+function metricMeasuringStrategy() {
+  let metricStrategy: BaseMetric;
   const environment = new Environment().detect();
   LOG('Current Browser:',
     environment.browser._type, environment.browser.version);
@@ -42,6 +42,7 @@ async function metricMeasuringStrategy() {
   }
 
   const totalLoadingTime = metricStrategy.computeTotalLoadingTime();
+  metricStrategy.measure();
 
   // Incorrect total loading time,
   // which means it's measured prematurely.
@@ -51,30 +52,19 @@ async function metricMeasuringStrategy() {
     return;
   }
 
-  const firstPaintTime = metricStrategy.computeFirstPaintTime();
-  const DNSLookupTime = metricStrategy.computeDNSLookupTime();
-  const firstByteTime = metricStrategy.computeFirstByteTime();
-  const firstInteractionTime = metricStrategy.computeFirstInteractionTime();
-  const resourcesTime = metricStrategy.computeResourceTime();
-  const totalDownloadingTime = metricStrategy.computeTotalDownloadingTime();
-  const DOMParsingTime = metricStrategy.computeDOMParsingTime();
-
-  LOG('DNSLookupTime:', DNSLookupTime);
+  LOG('DNSLookupTime:', metricStrategy.DNSLookupTime);
   LOG('Total Loading Time:', totalLoadingTime);
-  LOG('First Byte Time:', firstByteTime);
-  LOG('First Paint Time', firstPaintTime);
-  LOG('First Intercation Time', firstInteractionTime);
-  LOG('Resource Time:', JSON.stringify(resourcesTime));
-  LOG('Total Downloding Time:', totalDownloadingTime);
-  LOG('DOM Parsing Time:', DOMParsingTime);
+  LOG('First Byte Time:', metricStrategy.firstByteTime);
+  LOG('First Paint Time', metricStrategy.firstPaintTime);
+  LOG('First Intercation Time', metricStrategy.firstInteractionTime);
+  LOG('Resource Time:', JSON.stringify(metricStrategy.computeResourceTime()));
+  LOG('Total Downloding Time:', metricStrategy.downloadingTime);
+  LOG('DOM Parsing Time:', metricStrategy.DOMParsingTime);
 
   const reporter = new PerformanceReporter();
-  try {
-    await reporter.report('');
-  } catch (error) {
-    // Reporting process may fail,
-    // retry or report by other approach.
-  }
+  reporter.report(environment, metricStrategy).catch(() => {
+    LOG('Failed to report performance metrics');
+  });
 }
 
 // Start measuring after page loaded completely

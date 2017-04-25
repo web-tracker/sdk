@@ -67,6 +67,25 @@ export class BaseMetric extends Metric implements Measurable {
   }
 
   /**
+   * Perform mesauring works.
+   */
+  public measure() {
+    const resourcesTime = this.computeResourceTime();
+    this.DNSLookupTime = this.computeDNSLookupTime();
+    this.DOMParsingTime = this.computeDOMParsingTime();
+    this.firstByteTime = this.computeFirstByteTime();
+    this.firstInteractionTime = this.computeFirstInteractionTime();
+    this.firstMeaningfulTime = this.computeFirstMeaningfulTime();
+    this.firstPaintTime = this.computeFirstPaintTime();
+    this.downloadingTime = this.computeTotalDownloadingTime();
+    this.totalLoadingTime = this.computeTotalLoadingTime();
+    this.imagesTime = resourcesTime.img;
+    this.stylesTime = resourcesTime.link;
+    this.scriptsTime = resourcesTime.script;
+    return this;
+  }
+
+  /**
    * Polyfill for measuring first paint time.
    * The strategy is to use Timing API.
    * Compatibility: IE9+
@@ -79,7 +98,7 @@ export class BaseMetric extends Metric implements Measurable {
   }
 
   public computeFirstMeaningfulTime(): number {
-    throw new Error('Method not implemented.');
+    return -1;
   }
 
   /**
@@ -136,8 +155,10 @@ export class BaseMetric extends Metric implements Measurable {
     };
     const resourceMetric = resourcesItems.reduce((counter, current) => {
       const item = counter[current.initiatorType];
-      item.count += 1;
-      item.duration += current.duration;
+      if (item) {
+        item.count += 1;
+        item.duration += current.duration;
+      }
       return counter;
     }, resourceCounter);
     resourcesTime.img = Math.round(resourceMetric.img.duration / resourceMetric.img.count);

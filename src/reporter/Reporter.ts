@@ -1,47 +1,43 @@
-export type ParameterMap = {
-  key: string;
-  value: string;
-};
-
 export class Reporter {
   private imageReporter = new Image();
 
-  // Browser might ignore requests with the same url
-  private uniqueId: number = 0;
-
-  /**
-   * Report by sending xhr request.
-   */
-  protected reportByAjax(url: string, data: string): void {}
-
   /**
    * Report by Image object.
+   * TODO: is there any compatibility issues?
    * @return {Promise<void>}
    */
-  protected reportByImage(url: string): Promise<void> {
+  protected sendRequest(url: string): Promise<void> {
     this.imageReporter.src = url;
     return new Promise<void>((resolve, reject) => {
       const successCallback = () => {
         resolve();
-        this.imageReporter.removeEventListener('load', successCallback, false);
+        uninstallListeners();
       };
       const errorCallback = () => {
         reject();
-        this.imageReporter.removeEventListener('error', errorCallback, false);
+        uninstallListeners();
       };
       this.imageReporter.addEventListener('load', successCallback, false);
       this.imageReporter.addEventListener('error', errorCallback, false);
+
+      const uninstallListeners = () => {
+        this.imageReporter.removeEventListener('load', successCallback, false);
+        this.imageReporter.removeEventListener('error', errorCallback, false);
+      };
     });
   }
 
-  // Todo
-  protected URLBuilder(parameters: ParameterMap[]) {
+  protected URLBuilder(endpoint: string, parameters: Object): string {
+    if (!parameters) {
+      throw new Error('Parameters can not be empty');
+    }
+    const timestamp = (new Date()).valueOf();
     const queries: string[] = [];
-    for (const param of parameters) {
-      queries.push(`${param.key}=${param.value}`);
+    for (const key of Object.keys(parameters)) {
+      queries.push(`${key}=${parameters[key]}`);
     }
     const params = queries.join('&');
-    const builtURL = `?${this.uniqueId++}&${params}`;
-    return encodeURIComponent(builtURL);
+    const builtURL = `?${timestamp}&${params}`;
+    return encodeURI(endpoint + builtURL);
   }
 }

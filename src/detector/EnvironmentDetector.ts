@@ -31,7 +31,7 @@ const _detector: Detector = new Detector(
   detector.browser
 );
 
-LOG('detector:', JSON.stringify(_detector));
+LOG('detector:', _detector);
 
 export enum BrowserType {
   MSIE,
@@ -75,7 +75,7 @@ export class Browser {
 }
 
 export class Engine {
-  private _type: string;
+  public _type: string;
   constructor(
     public type: EngineType,
     public version: string
@@ -85,7 +85,7 @@ export class Engine {
 }
 
 export class OperatingSystem {
-  private _type: string;
+  public _type: string;
   constructor(
     public type: OSType,
     public version: string
