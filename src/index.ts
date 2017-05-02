@@ -10,6 +10,18 @@ import PerformanceReporter from './reporter/PerformanceReporter';
 
 export * from './detector/EnvironmentDetector';
 
+const _window: any = window;
+
+if (__DEV__) {
+  _window.WEB_TRACKER = {
+    token: 'token_string'
+  };
+}
+
+// Catch configuration file from global context
+const config: any = _window.WEB_TRACKER;
+const token = config.token;
+
 function metricMeasuringStrategy() {
   let metricStrategy: BaseMetric;
   const environment = new Environment().detect();
@@ -62,7 +74,7 @@ function metricMeasuringStrategy() {
   LOG('DOM Parsing Time:', metricStrategy.DOMParsingTime);
 
   const reporter = new PerformanceReporter();
-  reporter.report(environment, metricStrategy).catch(() => {
+  reporter.report(token, environment, metricStrategy).catch(() => {
     LOG('Failed to report performance metrics');
   });
 }

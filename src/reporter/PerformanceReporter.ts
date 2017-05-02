@@ -2,10 +2,6 @@ import { Reporter } from './Reporter';
 import { Metric } from '../metric/BaseMetric';
 import { Environment } from '../index';
 
-export interface MetricReportable {
-  report(environment: Environment, metric: Metric): void;
-}
-
 const parameterMapper = {
   firstPaintTime: 'fp',
   firstByteTime: 'fb',
@@ -20,18 +16,18 @@ const parameterMapper = {
   scriptsTime: 'sc'
 };
 
-export default class PerformanceReporter extends Reporter implements MetricReportable {
+export default class PerformanceReporter extends Reporter {
   private endpoint: string = `//127.0.0.1:3000/perf.gif`;
 
-  report(environment: Environment, metric: Metric): Promise<void> {
-    const parameters = this.parameterBuilder(environment, metric);
+  report(token: string, environment: Environment, metric: Metric): Promise<void> {
+    const parameters = this.parameterBuilder(token, environment, metric);
     const url = this.URLBuilder(this.endpoint, parameters);
     LOG('Combined parameters:', parameters);
     LOG('Report to url:', url);
     return this.sendRequest(url);
   }
 
-  private parameterBuilder(environment: Environment, metric: Metric) {
+  private parameterBuilder(token: string, environment: Environment, metric: Metric) {
     const parameters = {};
     const keys = Object.keys(metric);
     for (const key of keys) {
@@ -42,6 +38,9 @@ export default class PerformanceReporter extends Reporter implements MetricRepor
         parameters[alias] = value;
       }
     }
+
+    // Should also carry token string
+    parameters['token'] = token;
 
     // Combine environment infomation
     parameters['os'] = environment.operatingSystem._type.toLowerCase();
