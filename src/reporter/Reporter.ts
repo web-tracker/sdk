@@ -32,7 +32,7 @@ export class Reporter {
     if (!parameters) {
       throw new Error('Parameters can not be empty');
     }
-    const timestamp = (new Date()).valueOf();
+    const timestamp = +new Date();
     const queries: string[] = [];
     for (const key of Object.keys(parameters)) {
       const value = parameters[key];

@@ -39,6 +39,7 @@
     "typescript": "^2.3.0-dev.20170420"
   },
   "dependencies": {
-    "detector": "^2.5.0"
+    "detector": "^2.5.0",
+    "lz-string": "^1.4.4"
   }
 }

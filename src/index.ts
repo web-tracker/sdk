@@ -7,24 +7,41 @@ import SafariMetric from './metric/SafariMetric';
 import MSEdgeMetric from './metric/MSEdgeMetric';
 import MSIEMetric from './metric/MSIEMetric';
 import PerformanceReporter from './reporter/PerformanceReporter';
+import ErrorCatcher from './error/ErrorCatcher';
+import ErrorReporter from './reporter/ErrorReporter';
 
 export * from './detector/EnvironmentDetector';
 
 const _window: any = window;
 
 if (__DEV__) {
+  /**
+   * Basic configuration should retrived from
+   * server via Webtracker sdk.js file
+   */
   _window.WEB_TRACKER = {
-    token: 'token_string'
+    token: 'token_string',
+    metric: {
+      enabled: true
+    },
+    catcher: {
+      enabled: true,
+      random: 1,    // 0-1
+      repeat: 5,    // allow erorr repeat
+      merge: true,    // merge errors
+      delay: 1000,    // batch report
+      exclude: [/^Script error.?/i]    // support regex
+    }
   };
 }
 
 // Catch configuration file from global context
 const config: any = _window.WEB_TRACKER;
 const token = config.token;
+let metricStrategy: BaseMetric;
+const environment = new Environment().detect();
 
 function metricMeasuringStrategy() {
-  let metricStrategy: BaseMetric;
-  const environment = new Environment().detect();
   LOG('Current Browser:',
     environment.browser._type, environment.browser.version);
   switch (environment.browser.type) {
@@ -64,6 +81,7 @@ function metricMeasuringStrategy() {
     return;
   }
 
+  LOG('\n============ PERFORMANCE METRIC START ============');
   LOG('DNSLookupTime:', metricStrategy.DNSLookupTime);
   LOG('Total Loading Time:', totalLoadingTime);
   LOG('First Byte Time:', metricStrategy.firstByteTime);
@@ -73,13 +91,47 @@ function metricMeasuringStrategy() {
   LOG('Total Downloding Time:', metricStrategy.downloadingTime);
   LOG('DOM Parsing Time:', metricStrategy.DOMParsingTime);
 
-  const reporter = new PerformanceReporter();
-  reporter.report(token, environment, metricStrategy).catch(() => {
+  const reporter = new PerformanceReporter(token, environment);
+  const report = reporter.report(metricStrategy);
+  if (__DEV__) {
+    report.then(() => {
+      LOG('============ PERFORMANCE METRIC END ============\n\n');
+    });
+  }
+  report.catch(() => {
     LOG('Failed to report performance metrics');
   });
 }
 
+function installErrorCatcher() {
+  const reporter = new ErrorReporter(token, environment);
+  new ErrorCatcher(reporter).install();
+
+  if (__DEV__) {
+    setTimeout(() => {
+      throw new TypeError('Async error occurs');
+    }, 100);
+    setTimeout(() => {
+      throw new TypeError('Async error occurs');
+    }, 200);
+    setTimeout(() => {
+      throw new TypeError('Async error occurs');
+    }, 300);
+    setTimeout(() => {
+      throw new TypeError('Async error occurs');
+    }, 400);
+    throw new Error('Sync error occurs');
+  }
+}
+
 // Start measuring after page loaded completely
 window.addEventListener('load', () => {
-  setTimeout(() => metricMeasuringStrategy());
+  if (config.metric.enabled) {
+    setTimeout(() => metricMeasuringStrategy());
+  }
+  // Catcher starts after performance metric,
+  // So that metric report process won't be stopped
+  if (config.catcher.enabled) {
+    installErrorCatcher();
+  }
 });

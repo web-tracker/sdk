@@ -19,15 +19,19 @@ const parameterMapper = {
 export default class PerformanceReporter extends Reporter {
   private endpoint: string = `//127.0.0.1:3000/perf.gif`;
 
-  report(token: string, environment: Environment, metric: Metric): Promise<void> {
-    const parameters = this.parameterBuilder(token, environment, metric);
+  constructor(private token: string, private environment: Environment) {
+    super();
+  }
+
+  report(metric: Metric): Promise<void> {
+    const parameters = this.parameterBuilder(metric);
     const url = this.URLBuilder(this.endpoint, parameters);
     LOG('Combined parameters:', parameters);
     LOG('Report to url:', url);
     return this.sendRequest(url);
   }
 
-  private parameterBuilder(token: string, environment: Environment, metric: Metric) {
+  private parameterBuilder(metric: Metric) {
     const parameters = {};
     const keys = Object.keys(metric);
     for (const key of keys) {
@@ -40,14 +44,15 @@ export default class PerformanceReporter extends Reporter {
     }
 
     // Should also carry token string
-    parameters['token'] = token;
+    parameters['token'] = this.token;
 
     // Combine environment infomation
-    parameters['os'] = environment.operatingSystem._type.toLowerCase();
-    parameters['br'] = environment.browser._type.toLowerCase();
-    parameters['bv'] = environment.browser.version.toLowerCase();
-    parameters['dc'] = environment.device.type;
-    parameters['dv'] = environment.device.version;
+    parameters['os'] = this.environment.operatingSystem._type.toLowerCase();
+    parameters['br'] = this.environment.browser._type.toLowerCase();
+    parameters['bv'] = this.environment.browser.version.toLowerCase();
+    parameters['dc'] = this.environment.device.type;
+    parameters['dv'] = this.environment.device.version;
+
     return parameters;
   }
 

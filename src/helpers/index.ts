@@ -10,4 +10,3 @@ export function getOffsetTop(element: HTMLElement) {
   }
   return offsetTop;
 }
-
