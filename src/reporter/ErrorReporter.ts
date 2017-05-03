@@ -1,4 +1,3 @@
-import LZString from 'lz-string';
 import { Error } from '../error/ErrorCatcher';
 import { Environment } from '../detector/EnvironmentDetector';
 import BufferedReporter from './BufferedReporter';
@@ -17,23 +16,7 @@ export default class ErrorReporter extends BufferedReporter<Error> {
     const parameters = this.parameterBuilder(this.reportQueue);
     LOG('Error Parameters:', parameters);
     const url = this.URLBuilder(this.endpoint, parameters);
-    this._compressError(this.reportQueue);
     return this.sendRequest(url);
-  }
-
-  private _compressError(reportQueue: Error[]) {
-    for (const error of reportQueue) {
-      error.stack = this._commpress(error.stack);
-      error.message = this._commpress(error.message);
-      error.scriptURI = this._commpress(error.scriptURI);
-    }
-  }
-
-  /**
-   * Make error stack compressed.
-   */
-  private _commpress(text: string): string {
-    return LZString.compress(text);
   }
 
   /**

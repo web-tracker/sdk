@@ -35,6 +35,10 @@ if (__DEV__) {
   };
 }
 
+if (!_window.WEB_TRACKER) {
+  throw new Error('No configuration for Web Tracker is found');
+}
+
 // Catch configuration file from global context
 const config: any = _window.WEB_TRACKER;
 const token = config.token;
