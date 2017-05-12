@@ -17,7 +17,7 @@ const parameterMapper = {
 };
 
 export default class PerformanceReporter extends Reporter {
-    private endpoint: string = `//www.dobest.me:3030/perf.gif`;
+    private endpoint: string = `//webtracker.dobest.me:3030/perf.gif`;
 
     constructor(private token: string, private environment: Environment) {
         super();

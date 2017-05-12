@@ -3,7 +3,7 @@ import { Environment } from '../detector/EnvironmentDetector';
 import BufferedReporter from './BufferedReporter';
 
 export default class ErrorReporter extends BufferedReporter<Error> {
-    private endpoint: string = `//www.dobest.me:3030/error.gif`;
+    private endpoint: string = `//webtracker.dobest.me:3030/error.gif`;
 
     constructor(private token: string, private environment: Environment) { super(); }
 
