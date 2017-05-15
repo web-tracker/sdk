@@ -119,7 +119,12 @@ export class BaseMetric extends Metric implements Measurable {
    */
   public computeTotalLoadingTime(): number {
     if (!this.timing) return -1;
-    const loadingTime = Math.round(this.timing.loadEventEnd - this.timing.navigationStart);
+    let loadingTime = -1;
+    if (this.timing.loadEventEnd) {
+      loadingTime = Math.round(this.timing.loadEventEnd - this.timing.navigationStart);
+    } else {
+      loadingTime = Math.round(this.timing.domContentLoadedEventEnd - this.timing.navigationStart);
+    }
     return loadingTime <= 0 ? -1 : loadingTime;
   }
 
@@ -129,7 +134,12 @@ export class BaseMetric extends Metric implements Measurable {
    */
   public computeTotalDownloadingTime(): number {
     if (!this.timing) return -1;
-    const pageDownloadingTime = Math.round(this.timing.responseEnd - this.timing.requestStart);
+    let pageDownloadingTime = -1;
+    if (this.timing.responseEnd && this.timing.requestStart) {
+      pageDownloadingTime = Math.round(this.timing.responseEnd - this.timing.requestStart);
+    } else {
+      pageDownloadingTime = Math.round(this.timing.domInteractive - this.timing.navigationStart);
+    }
     return pageDownloadingTime <= 0 ? -1 : pageDownloadingTime;
   }
 
@@ -173,7 +183,12 @@ export class BaseMetric extends Metric implements Measurable {
    */
   public computeDOMParsingTime(): number {
     if (!this.timing) return -1;
-    const DOMParsingTime = Math.round(this.timing.domComplete - this.timing.responseEnd);
+    let DOMParsingTime = -1;
+    if (this.timing.domComplete && this.timing.responseEnd) {
+      DOMParsingTime = Math.round(this.timing.domComplete - this.timing.responseEnd);
+    } else {
+      DOMParsingTime = Math.round(this.timing.domContentLoadedEventEnd - this.timing.domLoading);
+    }
     return DOMParsingTime <= 0 ? -1 : DOMParsingTime;
   }
 
@@ -183,7 +198,7 @@ export class BaseMetric extends Metric implements Measurable {
    * @return {number}
    */
   public computeDNSLookupTime(): number {
-    if (!this.timing) return -1;
+    if (!this.timing || !this.timing.domainLookupEnd || !this.timing.domainLookupStart) return -1;
     const DNSTime = Math.round(this.timing.domainLookupEnd - this.timing.domainLookupStart);
     return DNSTime <= 0 ? -1 : DNSTime;
   }
@@ -195,7 +210,8 @@ export class BaseMetric extends Metric implements Measurable {
    */
   public computeFirstByteTime(): number {
     if (!this.timing) return -1;
-    const firstByteTime = Math.round(this.timing.responseStart - this.timing.navigationStart);
+    const respStart = this.timing.responseStart ? this.timing.responseStart : this.timing.domContentLoadedEventStart;
+    const firstByteTime = Math.round(respStart - this.timing.navigationStart);
     return firstByteTime <= 0 ? -1 : firstByteTime;
   }
 }

@@ -1,3 +1,4 @@
+import polyfill from './polyfill/polyfill';
 import { BrowserType, Environment } from './detector/EnvironmentDetector';
 import { BaseMetric } from './metric/BaseMetric';
 import ChromeMetric from './metric/ChromeMetric';
@@ -45,7 +46,7 @@ const token = config.token;
 let metricStrategy: BaseMetric;
 const environment = new Environment().detect();
 
-function metricMeasuringStrategy() {
+function metricMeasuringStrategy(polyfilled: boolean = false) {
   LOG('Current Browser:',
     environment.browser._type, environment.browser.version);
   switch (environment.browser.type) {
@@ -79,7 +80,7 @@ function metricMeasuringStrategy() {
 
   // Incorrect total loading time,
   // which means it's measured prematurely.
-  if (totalLoadingTime <= 0) {
+  if (totalLoadingTime <= 0 && !polyfilled) {
     LOG('Measured prematurely, retrying');
     metricMeasuringStrategy();
     return;
@@ -110,28 +111,20 @@ function metricMeasuringStrategy() {
 function installErrorCatcher() {
   const reporter = new ErrorReporter(token, environment);
   new ErrorCatcher(reporter).install();
-
-  if (__DEV__) {
-    setTimeout(() => {
-      throw new TypeError('Async error occurs');
-    }, 100);
-    setTimeout(() => {
-      throw new TypeError('Async error occurs');
-    }, 200);
-    setTimeout(() => {
-      throw new TypeError('Async error occurs');
-    }, 300);
-    setTimeout(() => {
-      throw new TypeError('Async error occurs');
-    }, 400);
-    throw new Error('Sync error occurs');
-  }
 }
 
 // Start measuring after page loaded completely
 window.addEventListener('load', () => {
   if (config.metric.enabled) {
-    setTimeout(() => metricMeasuringStrategy());
+    // if (__DEV__) _window.performance = undefined;
+    let polyfilled = false;
+    if (!_window.performance) {
+      // Load polyfills
+      polyfill(_window);
+      polyfilled = true;
+      LOG('Performance polyfill loaded');
+    }
+    setTimeout(() => metricMeasuringStrategy(polyfilled));
   }
   // Catcher starts after performance metric,
   // So that metric report process won't be stopped

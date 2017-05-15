@@ -6,9 +6,9 @@
         "sourceMap": false,
         "allowJs": true,
         "lib": [
-            "dom", "es2017"
+            "dom",
+            "es2017"
         ],
-
         // Enhance Strictness
         "noImplicitAny": false,
         "suppressImplicitAnyIndexErrors": true,
